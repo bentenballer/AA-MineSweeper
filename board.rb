@@ -29,6 +29,28 @@ class Board
         end
     end
 
+    def find_neighbors
+        (0...@board.length).each do |row|
+            (0...@board.length).each do |col|
+                self[row, col].add_neighbors
+            end
+        end
+    end
+
+    def neighbors_for_bombs
+        (0...@board.length).each do |row|
+            (0...@board.length).each do |col|
+                self[row, col].neighbors.each do |neighbor|
+                    if !(0...@board.length).include?(neighbor[0]) || !(0...@board.length).include?(neighbor[1]) || self[neighbor[0], neighbor[1]].bomb == false
+                        next
+                    else
+                        self[row, col].neighbors_bomb_count
+                    end
+                end
+            end
+        end
+    end
+
     def [](*pos)
         @board[pos[0]][pos[1]]
     end

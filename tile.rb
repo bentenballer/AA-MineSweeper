@@ -19,7 +19,7 @@ class Tile
         @revealed = true
     end
 
-    def neighbors
+    def add_neighbors
         row, col = @pos[0], @pos[1]
         @neighbors << [row - 1, col + 1]
         @neighbors << [row, col + 1] 
