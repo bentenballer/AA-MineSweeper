@@ -1,5 +1,5 @@
 class Tile
-    attr_reader :bombed
+    attr_reader :bomb
     attr_reader :neighbors
 
     def initialize(pos)
@@ -28,5 +28,9 @@ class Tile
         @neighbors << [row + 1, col - 1] 
         @neighbors << [row, col - 1] 
         @neighbors <<  [row - 1, col - 1] 
+    end
+
+    def neighbors_bomb_count
+        @neighbors_bomb_count += 1
     end
 end
