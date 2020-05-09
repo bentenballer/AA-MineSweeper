@@ -4,8 +4,9 @@ require "byebug"
 class Board
     attr_reader :board
 
-    def initialize
+    def initialize(bombs)
         @board = Array.new(9) {Array.new(9)}
+        @bombs = bombs
     end
 
     def create_tiles
@@ -18,7 +19,7 @@ class Board
     end
 
     def set_bombs
-        bombs = 10
+        bombs = @bombs
         while bombs > 0
             row = rand(@board.length)
             col = rand(@board.length)
@@ -37,18 +38,24 @@ class Board
         end
     end
 
+    def check_for_valid_neighbors
+        (0...@board.length).each do |row|
+            (0...@board.length).each do |col|
+                self[row, col].neighbors.select! { |neighbor| neighbor if (0...@board.length).include?(neighbor[0]) && (0...@board.length).include?(neighbor[1]) }
+            end
+        end
+    end
+
     def neighbors_for_bombs
         (0...@board.length).each do |row|
             (0...@board.length).each do |col|
-                self[row, col].neighbors.each do |neighbor|
-                    if !(0...@board.length).include?(neighbor[0]) || !(0...@board.length).include?(neighbor[1]) || self[neighbor[0], neighbor[1]].bomb == false
-                        next
-                    else
-                        self[row, col].neighbors_bomb_count
-                    end
-                end
+                self[row, col].neighbors.each { |neighbor| self[row, col].neighbors_bomb_count if self[neighbor[0], neighbor[1]].bomb == false } 
             end
         end
+    end
+
+    def length
+        @board.length
     end
 
     def [](*pos)
