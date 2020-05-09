@@ -1,5 +1,5 @@
 class Tile
-    attr_reader :bomb, :neighbors, flagged, revealed, :@neighbors_bomb_count
+    attr_reader :bomb, :neighbors, :flagged, :revealed, :neighbors_bomb_count
     
     def initialize(pos)
         @pos = pos

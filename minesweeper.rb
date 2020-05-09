@@ -18,7 +18,7 @@ class MineSweeper
 
     def render
         (0...@board.length).each do |row|
-            puts "".ljust(20, "-")
+            puts "".ljust(37, "-")
             (0...@board.length).each do |col|
                 print "|".ljust(2)
                 if @board[row, col].flagged == false && @board[row, col].revealed == false
@@ -29,6 +29,8 @@ class MineSweeper
                     print "#{@board[row, col].neighbor_bomb_count}".ljust(2)
                 end
             end
+            print"|"
+            puts
         end
     end
 end
