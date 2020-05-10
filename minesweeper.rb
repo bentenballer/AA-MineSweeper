@@ -6,6 +6,8 @@ class MineSweeper
         puts "How many bombs?"
         input = gets.chomp
         @board = Board.new(input.to_i)
+        @players_choice = []
+        @flagged = []
     end
 
     def get_choice
@@ -61,15 +63,26 @@ class MineSweeper
         get_pos = self.get_pos
 
         if choice == "r"
+            @players_choice << get_pos
             @board.reveal(get_pos)
             self.render
         else
+            @flagged << get_pos
             @board.flag(get_pos)
             self.render
         end
     end
 
     def game_over?
+        if self.bomb?
+            puts "You stepped on a bomb!"
+            return true
+        end
+    end
+
+    def bomb?
+        last_pos = @players_choice[-1]
+        @board.bomb?(last_pos)
     end
 
     def run
@@ -83,9 +96,11 @@ class MineSweeper
             (0...@board.length).each do |col|
                 print "|".ljust(2)
                 if @board[row, col].flagged == false && @board[row, col].revealed == false
-                    print "*".ljust(2)
+                    print "_".ljust(2)
                 elsif @board[row, col].flagged == true
                     print "f".ljust(2)
+                elsif  @board[row, col].revealed == true && @board[row, col].bomb == true
+                   print "*".ljust(2)
                 else
                     print "#{@board[row, col].neighbors_bomb_count}".ljust(2)
                 end

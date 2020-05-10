@@ -55,16 +55,19 @@ class Board
     end
 
     def reveal_neighbors(pos)
-        debugger
         self[pos[0],pos[1]].neighbors.each do |neighbor|
-            reveal(neighbor)
+            reveal(neighbor) if self[neighbor[0], neighbor[1]].bomb == false
         end
     end
 
     def reveal(pos)
-        return self[pos[0],pos[1]].reveal if self[pos[0],pos[1]].neighbors_bomb_count != 0
+        return self[pos[0],pos[1]].reveal if self[pos[0],pos[1]].neighbors_bomb_count != 0 || 
         reveal_neighbors(pos) 
         self[pos[0],pos[1]].reveal
+    end
+
+    def bomb?(pos)
+        self[pos[0], pos[1]].bomb == true
     end
 
     def flag(pos)
