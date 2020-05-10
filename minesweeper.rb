@@ -41,12 +41,20 @@ class MineSweeper
     end
 
     def valid_pos?(pos)
-        debugger
         pos.length == 2 && pos.is_a?(Array) && pos.all?{|i| i > -1 && i < @board.length }
     end
 
     def parse_pos(pos)
         pos.split(",").map{ |i| i.to_i }
+    end
+
+    def start_the_game
+        @board.create_tiles
+        @board.set_bombs
+        @board.find_neighbors
+        @board.check_for_valid_neighbors
+        @board.neighbors_for_bombs
+        self.render
     end
 
     def play_turn
@@ -62,13 +70,12 @@ class MineSweeper
         end
     end
 
+    def game_over?
+    end
+
     def run
-        @board.create_tiles
-        @board.set_bombs
-        @board.find_neighbors
-        @board.check_for_valid_neighbors
-        @board.neighbors_for_bombs
-        self.render
+        self.start_the_game
+        self.play_turn until self.game_over?
     end
 
     def render
@@ -81,7 +88,7 @@ class MineSweeper
                 elsif @board[row, col].flagged == true
                     print "f".ljust(2)
                 else
-                    print "#{@board[row, col].neighbor_bomb_count}".ljust(2)
+                    print "#{@board[row, col].neighbors_bomb_count}".ljust(2)
                 end
             end
             print"|"

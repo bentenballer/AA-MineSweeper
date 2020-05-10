@@ -49,17 +49,17 @@ class Board
     def neighbors_for_bombs
         (0...@board.length).each do |row|
             (0...@board.length).each do |col|
-                self[row, col].neighbors.each { |neighbor| self[row, col].neighbors_bomb_count if self[neighbor[0], neighbor[1]].bomb == true } 
+                self[row, col].neighbors.each { |neighbor| self[row, col].bomb_count if self[neighbor[0], neighbor[1]].bomb == true } 
             end
         end
     end
 
     def reveal(pos)
-        @board[pos[0],pos[1]].reveal
+        self[pos[0],pos[1]].reveal
     end
 
     def flag(pos)
-        @board[pos[0],pos[1]].flag
+        self[pos[0],pos[1]].flag
     end
     def length
         @board.length

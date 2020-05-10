@@ -34,7 +34,7 @@ class Tile
         @neighbors <<  [row - 1, col - 1] 
     end
 
-    def neighbors_bomb_count
+    def bomb_count
         @neighbors_bomb_count += 1
     end
 end
