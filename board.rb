@@ -28,11 +28,7 @@ class Board
     end
 
     def find_neighbors
-        (0...@board.length).each do |row|
-            (0...@board.length).each do |col|
-                self[row, col].add_neighbors
-            end
-        end
+        (0...@board.length).each{|row| (0...@board.length).each{|col| self[row, col].add_neighbors}}
     end
 
     def check_for_valid_neighbors
@@ -75,11 +71,7 @@ class Board
     end
 
     def win?
-        (0...@board.length).each do |row|
-            (0...@board.length).each do |col|
-                return false if self[row, col].revealed == false && self[row, col].bomb == false
-            end
-        end
+        (0...@board.length).each {|row| (0...@board.length).each {|col| return false if self[row, col].revealed == false && self[row, col].bomb == false}}
         true
     end
 

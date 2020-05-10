@@ -1,18 +1,35 @@
 require_relative "board"
+require "yaml"
 
 class MineSweeper
     def initialize
         system("clear")
-        puts "How many bombs?"
-        input = gets.chomp
-        @board = Board.new(input.to_i)
-        @players_choice = []
+        if load_game?
+            print "Please enter the file name: "
+            filename = gets.chomp
+            self.load_game(filename).continue
+        else
+            puts "How many bombs?"
+            input = gets.chomp
+            @board = Board.new(input.to_i)
+            @players_choice = []
+        end
+    end
+
+    def load_game?
+        load = "a"
+        while load.downcase != "y" && load.downcase != "n"
+            print "Load game? (Y/N): "
+            load = gets.chomp
+        end
+        return true if load.downcase == "y"
+        false
     end
 
     def get_choice
         input = nil 
         while !valid_choice?(input)
-            print "Please make your move ('r' for reveal or 'f' for flag): "
+            print "Please make your move ('r' for reveal, 'f' for flag, 's' to save your progress): "
             input = gets.chomp
         end
         input
@@ -20,7 +37,7 @@ class MineSweeper
 
     def valid_choice?(input)
         return false if input == nil
-        input.downcase == 'r' || input.downcase == 'f'
+        input.downcase == 'r' || input.downcase == 'f' || input.downcase == 's'
     end
 
     def get_pos
@@ -59,17 +76,20 @@ class MineSweeper
 
     def play_turn
         choice = self.get_choice
-        get_pos = self.get_pos
-
-        system("clear")
-
         if choice == "r"
+            get_pos = self.get_pos
             @players_choice << get_pos
             @board.reveal(get_pos)
             self.render
-        else
+        elsif choice == "f"
+            get_pos = self.get_pos
             @board.flag(get_pos)
             self.render
+        else
+            print "Please enter the file name to save this game: "
+            filename = gets.chomp
+            self.save_game(filename)
+            exit
         end
     end
 
@@ -100,7 +120,13 @@ class MineSweeper
         self.play_turn until self.game_over?
     end
 
+    def continue
+        self.render
+        self.play_turn until self.game_over?
+    end
+
     def render
+        system("clear")
         (0...@board.length).each do |row|
             (0...@board.length).each do |col|
                 print "|".ljust(2)
@@ -118,7 +144,15 @@ class MineSweeper
             puts
         end
     end
+
+    def save_game(filename)
+        File.open(filename, "w") {|file| file.write(self.to_yaml)}
+    end
+    
+    def load_game(filename)
+        YAML.load(File.read(filename))
+    end
 end
 
-m = MineSweeper.new
-m.run
+#m = MineSweeper.new
+#m.run
