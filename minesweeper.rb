@@ -1,19 +1,18 @@
 require_relative "board"
-require "byebug"
-class MineSweeper
 
+class MineSweeper
     def initialize
+        system("clear")
         puts "How many bombs?"
         input = gets.chomp
         @board = Board.new(input.to_i)
         @players_choice = []
-        @flagged = []
     end
 
     def get_choice
         input = nil 
         while !valid_choice?(input)
-            print "Please make your make ('r' for reveal or 'f' for flag): "
+            print "Please make your move ('r' for reveal or 'f' for flag): "
             input = gets.chomp
         end
         input
@@ -63,13 +62,12 @@ class MineSweeper
         get_pos = self.get_pos
 
         system("clear")
-        
+
         if choice == "r"
             @players_choice << get_pos
             @board.reveal(get_pos)
             self.render
         else
-            @flagged << get_pos
             @board.flag(get_pos)
             self.render
         end
@@ -78,8 +76,17 @@ class MineSweeper
     def game_over?
         if self.bomb?
             puts "You stepped on a bomb!"
-            return true
+            true
+        elsif self.win?
+            puts "You win!"
+            true
+        else
+            false
         end
+    end
+
+    def win?
+        @board.win?
     end
 
     def bomb?
@@ -95,7 +102,6 @@ class MineSweeper
 
     def render
         (0...@board.length).each do |row|
-            puts "".ljust(37, "-")
             (0...@board.length).each do |col|
                 print "|".ljust(2)
                 if @board[row, col].flagged == false && @board[row, col].revealed == false
@@ -113,3 +119,6 @@ class MineSweeper
         end
     end
 end
+
+m = MineSweeper.new
+m.run

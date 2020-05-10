@@ -1,9 +1,6 @@
 require_relative "tile"
-require "byebug"
 
 class Board
-    attr_reader :board
-
     def initialize(bombs)
         @board = Array.new(9) {Array.new(9)}
         @bombs = bombs
@@ -56,17 +53,17 @@ class Board
         end
     end
 
+    def safe_neighborhood?(pos)
+        self[pos[0],pos[1]].neighbors.all? { |neighbor| self[neighbor[0], neighbor[1]].bomb == false }
+    end
+
     def reveal_neighbors(pos)
-        self[pos[0],pos[1]].neighbors.each do |neighbor|
-            reveal(neighbor)
-        end
+        self[pos[0],pos[1]].neighbors.each { |neighbor| reveal(neighbor) if self[neighbor[0], neighbor[1]].revealed == false }
     end
 
     def reveal(pos)
-        return if self[pos[0],pos[1]].bomb == true
-        return self[pos[0],pos[1]].reveal if self[pos[0],pos[1]].neighbors_bomb_count != 0 
-        reveal_neighbors(pos) 
         self[pos[0],pos[1]].reveal
+        reveal_neighbors(pos) if safe_neighborhood?(pos)
     end
 
     def bomb?(pos)
@@ -76,6 +73,16 @@ class Board
     def flag(pos)
         self[pos[0],pos[1]].flag
     end
+
+    def win?
+        (0...@board.length).each do |row|
+            (0...@board.length).each do |col|
+                return false if self[row, col].revealed == false && self[row, col].bomb == false
+            end
+        end
+        true
+    end
+
     def length
         @board.length
     end
