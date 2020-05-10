@@ -7,6 +7,53 @@ class MineSweeper
         @board = Board.new(input.to_i)
     end
 
+    def valid_choice(input)
+        input.downcase == 'r' || input.downcase == 'f'
+    end
+
+    def get_choice
+        input = nil 
+        while valid_choice?(input)
+            print "Please make your make ('r' for reveal or 'f' for flag): "
+            input = gets.chomp
+        end
+        input
+    end
+
+    def get_pos
+        pos = nil
+        until pos && valid_pos?(pos)
+            puts "Please enter the position for this move (e.g., '3,4')"
+            print "> "
+      
+            begin
+              pos = parse_pos(gets.chomp)
+            rescue
+              puts "Invalid position entered (did you use a comma?)"
+              puts ""
+      
+              pos = nil
+            end
+        end
+        pos  
+    end
+
+    def valid_pos?(pos)
+        pos.length == 2 && pos.is_a?(Array) && pos.all?{|i| i > -1 && i < @board.length }
+    end
+
+    def parse_pos(pos)
+        pos.split(",").select{ |i| i }
+    end
+
+    def play_turn
+        choice = self.get_choice
+        get_pos = self.get_pos
+    end
+
+    def reveal
+    end
+
     def run
         @board.create_tiles
         @board.set_bombs
