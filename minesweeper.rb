@@ -25,7 +25,7 @@ class MineSweeper
     def get_pos
         pos = nil
         until pos && valid_pos?(pos)
-            puts "Please enter the position for this move (e.g., '3,4')"
+            print "Please enter the position for this move (e.g., '3,4'): "
             print "> "
       
             begin
