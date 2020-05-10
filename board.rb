@@ -61,11 +61,8 @@ class Board
     end
 
     def reveal(pos)
-        if self[pos[0],pos[1]].neighbors_bomb_count == 0
-            reveal_neighbors(pos)
-        else
-            self[pos[0],pos[1]].reveal
-        end
+        self[pos[0],pos[1]].reveal if self[pos[0],pos[1]].neighbors_bomb_count != 0
+        reveal_neighbors(pos) 
     end
 
     def flag(pos)

@@ -26,7 +26,6 @@ class MineSweeper
         pos = nil
         until pos && valid_pos?(pos)
             print "Please enter the position for this move (e.g., '3,4'): "
-            print "> "
       
             begin
               pos = parse_pos(gets.chomp)
