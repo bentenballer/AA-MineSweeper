@@ -41,7 +41,9 @@ class Board
     def check_for_valid_neighbors
         (0...@board.length).each do |row|
             (0...@board.length).each do |col|
-                self[row, col].neighbors.select! { |neighbor| neighbor if (0...@board.length).include?(neighbor[0]) && (0...@board.length).include?(neighbor[1]) }
+                self[row, col].neighbors.select! do |neighbor| 
+                    neighbor if (0...@board.length).include?(neighbor[0]) && (0...@board.length).include?(neighbor[1])
+                end
             end
         end
     end
@@ -56,12 +58,13 @@ class Board
 
     def reveal_neighbors(pos)
         self[pos[0],pos[1]].neighbors.each do |neighbor|
-            reveal(neighbor) if self[neighbor[0], neighbor[1]].bomb == false
+            reveal(neighbor)
         end
     end
 
     def reveal(pos)
-        return self[pos[0],pos[1]].reveal if self[pos[0],pos[1]].neighbors_bomb_count != 0 || 
+        return if self[pos[0],pos[1]].bomb == true
+        return self[pos[0],pos[1]].reveal if self[pos[0],pos[1]].neighbors_bomb_count != 0 
         reveal_neighbors(pos) 
         self[pos[0],pos[1]].reveal
     end

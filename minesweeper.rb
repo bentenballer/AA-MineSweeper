@@ -62,6 +62,8 @@ class MineSweeper
         choice = self.get_choice
         get_pos = self.get_pos
 
+        system("clear")
+        
         if choice == "r"
             @players_choice << get_pos
             @board.reveal(get_pos)
@@ -82,6 +84,7 @@ class MineSweeper
 
     def bomb?
         last_pos = @players_choice[-1]
+        return false if last_pos == nil
         @board.bomb?(last_pos)
     end
 
