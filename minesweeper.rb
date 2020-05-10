@@ -1,4 +1,5 @@
 require_relative "board"
+require "byebug"
 class MineSweeper
 
     def initialize
@@ -7,17 +8,18 @@ class MineSweeper
         @board = Board.new(input.to_i)
     end
 
-    def valid_choice(input)
-        input.downcase == 'r' || input.downcase == 'f'
-    end
-
     def get_choice
         input = nil 
-        while valid_choice?(input)
+        while !valid_choice?(input)
             print "Please make your make ('r' for reveal or 'f' for flag): "
             input = gets.chomp
         end
         input
+    end
+
+    def valid_choice?(input)
+        return false if input == nil
+        input.downcase == 'r' || input.downcase == 'f'
     end
 
     def get_pos
@@ -39,19 +41,25 @@ class MineSweeper
     end
 
     def valid_pos?(pos)
+        debugger
         pos.length == 2 && pos.is_a?(Array) && pos.all?{|i| i > -1 && i < @board.length }
     end
 
     def parse_pos(pos)
-        pos.split(",").select{ |i| i }
+        pos.split(",").map{ |i| i.to_i }
     end
 
     def play_turn
         choice = self.get_choice
         get_pos = self.get_pos
-    end
 
-    def reveal
+        if choice == "r"
+            @board.reveal(get_pos)
+            self.render
+        else
+            @board.flag(get_pos)
+            self.render
+        end
     end
 
     def run

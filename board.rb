@@ -54,6 +54,13 @@ class Board
         end
     end
 
+    def reveal(pos)
+        @board[pos[0],pos[1]].reveal
+    end
+
+    def flag(pos)
+        @board[pos[0],pos[1]].flag
+    end
     def length
         @board.length
     end

@@ -13,6 +13,10 @@ class Tile
     def set_bomb
         @bomb = true
     end
+
+    def flag
+        @flagged = true
+    end
     
     def reveal
         @revealed = true
