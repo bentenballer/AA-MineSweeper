@@ -1,4 +1,5 @@
 require_relative "board"
+require "colorize"
 require "yaml"
 
 class MineSweeper
@@ -129,18 +130,18 @@ class MineSweeper
         system("clear")
         (0...@board.length).each do |row|
             (0...@board.length).each do |col|
-                print "|".ljust(2)
+                print "|".ljust(2).colorize(:green)
                 if @board[row, col].flagged == false && @board[row, col].revealed == false
-                    print "_".ljust(2)
+                    print "_".ljust(2).colorize(:green)
                 elsif @board[row, col].flagged == true
-                    print "f".ljust(2)
+                    print "f".ljust(2).colorize(:blue)
                 elsif  @board[row, col].revealed == true && @board[row, col].bomb == true
-                   print "*".ljust(2)
+                   print "*".ljust(2).colorize(:red)
                 else
-                    print "#{@board[row, col].neighbors_bomb_count}".ljust(2)
+                    print "#{@board[row, col].neighbors_bomb_count}".ljust(2).colorize(:yellow)
                 end
             end
-            print"|"
+            print"|".colorize(:green)
             puts
         end
     end
@@ -154,5 +155,5 @@ class MineSweeper
     end
 end
 
-#m = MineSweeper.new
-#m.run
+m = MineSweeper.new
+m.run
