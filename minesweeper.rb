@@ -1,4 +1,5 @@
 require_relative "board"
+require_relative "leaderboard"
 require 'io/console'
 require "colorize"
 require "yaml"
@@ -16,6 +17,8 @@ class MineSweeper
             puts "How many bombs?"
             input = gets.chomp
             @board = Board.new(input.to_i)
+            @leaderboard = YAML.load(File.read("leaderboard"))
+            @turns = 0
             @cursor_pos = [0,0]
             @players_choice = []
         end
@@ -48,10 +51,12 @@ class MineSweeper
         when "q"
             exit
         when "r"
+            @turns += 1
             @players_choice << @cursor_pos
             @board.reveal(@cursor_pos)
             self.render
         when "f"
+            @turns += 1
             @board.flag(@cursor_pos)
             self.render
         when "s"
@@ -121,6 +126,10 @@ class MineSweeper
             true
         elsif self.win?
             puts "You win!"
+            puts
+            @leaderboard.add_to_leaderboard(@turns)
+            @leaderboard.save
+            @leaderboard.display
             true
         else
             false
@@ -138,6 +147,9 @@ class MineSweeper
     end
 
     def run
+        puts
+        @leaderboard.display
+        sleep(3)
         self.start_the_game
         self.play_turn until self.game_over?
     end
