@@ -1,4 +1,5 @@
 require_relative "board"
+require 'io/console'
 require "colorize"
 require "yaml"
 
@@ -10,11 +11,85 @@ class MineSweeper
             filename = gets.chomp
             self.load_game(filename).continue
         else
+            system("clear")
+            puts "This is a new game!"
             puts "How many bombs?"
             input = gets.chomp
             @board = Board.new(input.to_i)
+            @cursor_pos = [0,0]
             @players_choice = []
         end
+    end
+
+    # Reads keypresses from the user including 2 and 3 escape character sequences.
+    def read_char
+        STDIN.echo = false
+        STDIN.raw!
+    
+        input = STDIN.getc.chr
+        if input == "\e" then
+          input << STDIN.read_nonblock(3) rescue nil
+          input << STDIN.read_nonblock(2) rescue nil
+        end
+      ensure
+        STDIN.echo = true
+        STDIN.cooked!
+    
+        return input
+      end
+
+      # oringal case statement from:
+      # http://www.alecjacobson.com/weblog/?p=75
+    def move
+        puts "Please make your move (use arrow keys to move, 'r' for reveal, 'f' for flag, 's' to save your progress)"
+        c = read_char
+    
+        case c
+        when "q"
+            exit
+        when "r"
+            @players_choice << @cursor_pos
+            @board.reveal(@cursor_pos)
+            self.render
+        when "f"
+            @board.flag(@cursor_pos)
+            self.render
+        when "s"
+            print "Please enter the file name to save this game: "
+            filename = gets.chomp
+            self.save_game(filename)
+            exit
+        when "\e[A" # "UP ARROW"
+           row, col = @cursor_pos[0] - 1, @cursor_pos[1]
+           if valid_range?(row)
+                @cursor_pos = [row, col]
+           end
+           self.render
+        when "\e[B" # "DOWN ARROW"
+            row, col = @cursor_pos[0] + 1, @cursor_pos[1]
+           if valid_range?(row)
+                @cursor_pos = [row, col]
+           end
+           self.render
+        when "\e[C"  # "RIGHT ARROW"
+            row, col = @cursor_pos[0], @cursor_pos[1] + 1
+           if valid_range?(col)
+                @cursor_pos = [row, col]
+           end
+           self.render
+        when "\e[D" # "LEFT ARROW"
+            row, col = @cursor_pos[0], @cursor_pos[1] - 1
+           if valid_range?(col)
+                @cursor_pos = [row, col]
+           end
+           self.render
+        else
+            self.render
+        end
+    end
+
+    def valid_range?(range)
+        range.between?(0, @board.length - 1)
     end
 
     def load_game?
@@ -27,45 +102,6 @@ class MineSweeper
         false
     end
 
-    def get_choice
-        input = nil 
-        while !valid_choice?(input)
-            print "Please make your move ('r' for reveal, 'f' for flag, 's' to save your progress): "
-            input = gets.chomp
-        end
-        input
-    end
-
-    def valid_choice?(input)
-        return false if input == nil
-        input.downcase == 'r' || input.downcase == 'f' || input.downcase == 's'
-    end
-
-    def get_pos
-        pos = nil
-        until pos && valid_pos?(pos)
-            print "Please enter the position for this move (e.g., '3,4'): "
-      
-            begin
-              pos = parse_pos(gets.chomp)
-            rescue
-              puts "Invalid position entered (did you use a comma?)"
-              puts ""
-      
-              pos = nil
-            end
-        end
-        pos  
-    end
-
-    def valid_pos?(pos)
-        pos.length == 2 && pos.is_a?(Array) && pos.all?{|i| i > -1 && i < @board.length }
-    end
-
-    def parse_pos(pos)
-        pos.split(",").map{ |i| i.to_i }
-    end
-
     def start_the_game
         @board.create_tiles
         @board.set_bombs
@@ -76,22 +112,7 @@ class MineSweeper
     end
 
     def play_turn
-        choice = self.get_choice
-        if choice == "r"
-            get_pos = self.get_pos
-            @players_choice << get_pos
-            @board.reveal(get_pos)
-            self.render
-        elsif choice == "f"
-            get_pos = self.get_pos
-            @board.flag(get_pos)
-            self.render
-        else
-            print "Please enter the file name to save this game: "
-            filename = gets.chomp
-            self.save_game(filename)
-            exit
-        end
+        self.move
     end
 
     def game_over?
@@ -132,18 +153,31 @@ class MineSweeper
             (0...@board.length).each do |col|
                 print "|".ljust(2).colorize(:green)
                 if @board[row, col].flagged == false && @board[row, col].revealed == false
-                    print "_".ljust(2).colorize(:green)
+                    if @cursor_pos == [row, col]
+                        print "_".ljust(2)
+                    else
+                        print "_".ljust(2).colorize(:green)
+                    end
                 elsif @board[row, col].flagged == true
-                    print "f".ljust(2).colorize(:blue)
+                    if @cursor_pos == [row, col]
+                        print "f".ljust(2)
+                    else
+                        print "f".ljust(2).colorize(:blue)
+                    end
                 elsif  @board[row, col].revealed == true && @board[row, col].bomb == true
                    print "*".ljust(2).colorize(:red)
                 else
-                    print "#{@board[row, col].neighbors_bomb_count}".ljust(2).colorize(:yellow)
+                    if @cursor_pos == [row, col]
+                        print "#{@board[row, col].neighbors_bomb_count}".ljust(2)
+                    else
+                        print "#{@board[row, col].neighbors_bomb_count}".ljust(2).colorize(:yellow)
+                    end
                 end
             end
             print"|".colorize(:green)
             puts
         end
+        puts "Current position is #{@cursor_pos}"
     end
 
     def save_game(filename)
